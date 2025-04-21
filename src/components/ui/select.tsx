@@ -38,7 +38,7 @@ const Select = (
         <div className="relative" onClick={() => setIsOpen(!isOpen)}>
             <motion.button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`bg-${selectedColor ?? color ?? 'white'}-200 text-white py-2 px-4 rounded-full`}
+                className={`bg-${selectedColor ?? color ?? 'white'}-200 text-white py-2 px-4 rounded-full cursor-pointer hover:scale-105 transition duration-300`}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
             >

@@ -6,7 +6,7 @@ export const getTasks = (): Promise<Task[]> => get('tasks').then(t => t || []);
 export const saveTasks = (tasks: Task[]) => set('tasks', tasks);
 
 // User
-export const getUser = (): Promise<User | null> => get('user');
+export const getUser = (): Promise<User | null | undefined> => get('user');
 export const saveUser = (user: User) => set('user', user);
 
 // Achievements

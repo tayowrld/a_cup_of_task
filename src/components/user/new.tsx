@@ -15,16 +15,16 @@ export const Newbie = () => {
 
   return (
     <div className="h-screen flex flex-col items-center justify-center bg-white-200 p-6">
-      <h2 className="text-2xl mb-4 text-[#130a07]">Привет! Как тебя зовут?</h2>
+      <h2 className="text-2xl mb-4 text-[#130a07]">Hello! What is your name?</h2>
       <input
         className="mb-3 p-2 border rounded w-64"
-        placeholder="Имя"
+        placeholder="Name"
         value={name}
         onChange={(e) => setName(e.target.value)}
       />
       <input
         className="mb-3 p-2 border rounded w-64"
-        placeholder="URL аватара"
+        placeholder="Avatar URL"
         value={avatar}
         onChange={(e) => setAvatar(e.target.value)}
       />
@@ -35,7 +35,7 @@ export const Newbie = () => {
         }}
         className="px-4 py-2 bg-green-200 rounded shadow hover:scale-105 transition"
       >
-        Поехали!
+        Take a sit here
       </button>
     </div>
   );
@@ -59,7 +59,7 @@ export const Profile = ({
   return (
     <div className="absolute right-0 mt-2 w-64 bg-white/20 backdrop-blur-lg p-4 rounded-lg shadow-lg z-50">
       <label className="block mb-2 text-white">
-        Имя
+        Name
         <input
           className="mt-1 w-full p-2 rounded bg-white/80 text-black"
           value={name}
@@ -79,14 +79,14 @@ export const Profile = ({
           onClick={() => onSubmit(name.trim(), avatar.trim())}
           className="px-3 py-1 bg-green-200 rounded hover:scale-105 transition cursor-pointer"
         >
-          Сохранить
+          Save
         </button>
         {onCancel && (
           <button
             onClick={onCancel}
             className="px-3 py-1 bg-red-200 rounded hover:scale-105 transition cursor-pointer"
           >
-            Отменить
+            Cancel
           </button>
         )}
       </div>

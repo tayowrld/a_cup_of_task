@@ -2,15 +2,11 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import {
-  IoCreate,
-  IoReturnDownBack,
-  IoCalendarOutline,
-} from "react-icons/io5";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useUser } from "@/contexts/UserContext";
 import { AchievementModal } from "@/components/user/AchievementModal";
+import { useACH } from "@/contexts/AchievementContext";
 import { Profile } from "@/components/user/new";
 
 interface HeaderProps {
@@ -20,13 +16,14 @@ interface HeaderProps {
 }
 
 const Header = ({ onCreateTask, onToggleEdit, onToggleCalendar }: HeaderProps) => {
-  const { user, updateUser } = useUser();
-
+  const { user, register, updateUser } = useUser();
+  const { openModal } = useACH();
   const [toolsOpen, setToolsOpen] = useState(false);
   const [profileMenu, setProfileMenu] = useState(false);
   const [editingProfile, setEditingProfile] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
+  // close menus on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -49,9 +46,10 @@ const Header = ({ onCreateTask, onToggleEdit, onToggleCalendar }: HeaderProps) =
   return (
     <>
       <header className="relative flex items-center justify-center px-6 py-4">
-        {/* PROFILE */}
-        {user && (
-          <div ref={menuRef} className="absolute top-5 right-5">
+        {/* PROFILE / REGISTER */}
+        <div ref={menuRef} className="absolute top-5 right-5">
+          {user && (
+            // once logged-in: show name/avatar
             <div
               onClick={() => {
                 setProfileMenu((v) => !v);
@@ -61,7 +59,7 @@ const Header = ({ onCreateTask, onToggleEdit, onToggleCalendar }: HeaderProps) =
             >
               <span className="text-xl font-semibold text-white">{user.name}</span>
               <Image
-                src={user.avatar || "/default-avatar.png"}
+                src={user.avatar || "/navigation/cup.svg"}
                 alt="avatar"
                 width={40}
                 height={40}
@@ -69,32 +67,35 @@ const Header = ({ onCreateTask, onToggleEdit, onToggleCalendar }: HeaderProps) =
                 unoptimized
               />
             </div>
+          )}
 
-            {profileMenu && !editingProfile && (
-              <div className="mt-2 w-40 bg-white/20 backdrop-blur-lg rounded-lg shadow-lg z-50 transition absolute left-[100%] translate-x-[-100%] cursor-pointer">
-                <button
-                  onClick={() => setEditingProfile(true)}
-                  className="w-full text-left px-4 py-2 text-white hover:bg-white/30 cursor-pointer"
-                >
-                  Изменить профиль
-                </button>
-              </div>
-            )}
-
-            {profileMenu && editingProfile && (
+          {/* dropdown for edit vs register form */}
+          {((user && profileMenu) || editingProfile) && (
+            <div className="mt-2 w-56 bg-white/20 backdrop-blur-lg rounded-lg shadow-lg z-50 absolute left-[100%] translate-x-[-100%]">
               <Profile
-                initialName={user.name}
-                initialAvatar={user.avatar}
+                // if editing existing, prefill; else blank
+                initialName={user?.name ?? ""}
+                initialAvatar={user?.avatar ?? ""}
                 onSubmit={(name, avatar) => {
-                  updateUser(name, avatar);
+                  if (user) {
+                    updateUser(name, avatar);
+                  } else {
+                    register(name, avatar);
+                  }
                   setEditingProfile(false);
                   setProfileMenu(false);
                 }}
-                onCancel={() => setEditingProfile(false)}
-              />
-            )}
-          </div>
-        )}
+                onCancel={() => {
+                  setEditingProfile(false);
+                  setProfileMenu(false);
+                }}
+              >
+                {/* hide inner register/edit button,
+                    we’re handling submit in the header */}
+              </Profile>
+            </div>
+          )}
+        </div>
 
         {/* MAIN BUTTON / NAV */}
         {!toolsOpen ? (
@@ -110,54 +111,54 @@ const Header = ({ onCreateTask, onToggleEdit, onToggleCalendar }: HeaderProps) =
               initial={{ opacity: 0, y: -5, scale: 0.8 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.5, type: "spring" }}
-              className="flex items-center space-x-4 text-3xl font-extrabold"
+              className="flex items-center space-x-4 text-3xl font-semibold"
             >
-              <span>Start a</span>
-              <Image src="/navigation/cup.svg" alt="cup" width={28} height={28} unoptimized />
+              <span>Edit</span>
+              <Image src="/navigation/cup.svg" alt="cup" width={28} height={28} />
               <span>session</span>
             </motion.div>
           </div>
         ) : (
-          <nav className="flex items-center space-x-4">
+          <motion.nav className="flex items-center space-x-4 transition-colors duration-300 cup_transition"
+              initial={{ opacity: 0, y: -5, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.5, type: "spring" }}>
             <button
               onClick={onCreateTask}
-              title="Создать задачу"
-              className="p-3 bg-white/20 rounded-full hover:scale-110 transition"
+              title="Create task"
+              className="p-3 bg-white/20 rounded-full hover:scale-110 transition duration-400 cursor-pointer"
               style={styleMain}
             >
-              <IoCreate className="w-6 h-6 text-white" />
+              <Image src="/navigation/new.svg" alt="new" width={40} height={40} />
             </button>
-
             <button
               onClick={onToggleCalendar}
-              title="Календарь"
-              className="p-3 bg-white/20 rounded-full hover:scale-110 transition"
+              title="Calendar"
+              className="p-3 bg-white/20 rounded-full hover:scale-110 transition cursor-pointer"
               style={styleMain}
             >
-              <IoCalendarOutline className="w-6 h-6 text-white" />
+              <Image src="/navigation/calendar.svg" alt="calendar" width={40} height={40} />
             </button>
-
-            {/* <button
+            <button
               onClick={openModal}
-              title="Достижения"
-              className="p-3 bg-white/20 rounded-full hover:scale-110 transition"
+              title="Achivments"
+              className="p-3 bg-white/20 rounded-full hover:scale-110 transition cursor-pointer"
               style={styleMain}
             >
-              <IoTrophyOutline className="w-6 h-6 text-white" />
-            </button> */}
-
+              <Image src="/navigation/achivement.svg" alt="achieve" width={40} height={40} />
+            </button>
             <button
               onClick={() => {
                 onToggleEdit();
                 setToolsOpen(false);
               }}
               title="Назад"
-              className="p-3 bg-white/20 rounded-full hover:scale-110 transition"
+              className="p-3 bg-white/20 rounded-full hover:scale-110 transition cursor-pointer"
               style={styleMain}
             >
-              <IoReturnDownBack className="w-6 h-6 text-white" />
+              <Image src="/navigation/done.svg" alt="done" width={40} height={40} />
             </button>
-          </nav>
+          </motion.nav>
         )}
       </header>
 

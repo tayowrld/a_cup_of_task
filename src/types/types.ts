@@ -1,5 +1,5 @@
 export interface Task {
-    id: number;
+    id: string;
     name: string;
     date: string;
     priority?: { value: string, color: string };
@@ -13,8 +13,10 @@ export interface User {
   
   export interface Achievement {
     id: number;
+    name: string;
     title: string;
     icon: string; // URL или data‑URI
     progress: number; //%
+    isCompleted?: boolean;
   }
   

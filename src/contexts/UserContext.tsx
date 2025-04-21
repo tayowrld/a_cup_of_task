@@ -16,7 +16,7 @@ export interface User {
   avatar: string;
 }
 
-interface UserContextValue {
+export interface UserContextValue {
   user: User | null;
   register: (name: string, avatar: string) => void;
   updateUser: (name: string, avatar: string) => void;

@@ -31,32 +31,31 @@ export const Calendar = ({ selectedDate, onSelectDate }: CalendarProps) => {
   const dayNumbers = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
   const monthNames = [
-    "Янв", "Фев", "Мар", "Апр", "Май", "Июн",
-    "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек",
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Avg", "Sen", "Oct", "Nov", "Dec",
   ];
 
   const handleClick = (d: number) => {
     const dt = new Date(year, month, d);
     dt.setHours(0, 0, 0, 0);
-    if (dt < today) {
-      alert("Нельзя выбирать прошлые даты — возвращаем на сегодня");
-      onSelectDate(today.toISOString().split("T")[0]);
+    if (dt > today) {
+      onSelectDate(today.toLocaleDateString("sv-SE"));
     } else {
-      onSelectDate(dt.toISOString().split("T")[0]);
+      onSelectDate(dt.toLocaleDateString("sv-SE"));
     }
   };
 
   return (
-    <div className="p-4 bg-white/20 backdrop-blur-lg rounded-lg shadow-lg z-50 absolute top-30 right-1/2 scale-130">
+    <div className="p-4 bg-white/20 backdrop-blur-lg rounded-lg shadow-lg z-50 absolute top-35 right-1/2 scale-130">
       <div className="flex justify-between items-center mb-2 text-white">
-        <button onClick={prevMonth} className="px-2">{"<"}</button>
+        <button onClick={prevMonth} className="px-2 cursor-pointer">{"<"}</button>
         <span className="font-semibold">
           {monthNames[month]} {year}
         </span>
-        <button onClick={nextMonth} className="px-2">{">"}</button>
+        <button onClick={nextMonth} className="px-2 cursor-pointer">{">"}</button>
       </div>
       <div className="grid grid-cols-7 gap-1 text-center text-sm text-white">
-        {["вс","пн","вт","ср","чт","пт","сб"].map((wd) => (
+        {["sun","mon","tue","wed","thu","fri","sat"].map((wd) => (
           <div key={wd} className="font-medium">{wd}</div>
         ))}
         {blanks.map((_, idx) => (
@@ -65,8 +64,8 @@ export const Calendar = ({ selectedDate, onSelectDate }: CalendarProps) => {
         {dayNumbers.map((d) => {
           const dt = new Date(year, month, d);
           dt.setHours(0,0,0,0);
-          const isSelected = selectedDate === dt.toISOString().split("T")[0];
-          const isPast = dt < today;
+          const isSelected = selectedDate === dt.toLocaleDateString("sv-SE");
+          const isPast = dt > today;
           return (
             <button
               key={d}
@@ -75,8 +74,8 @@ export const Calendar = ({ selectedDate, onSelectDate }: CalendarProps) => {
               className={`
                 py-1 rounded 
                 ${isSelected ? "bg-green-200 text-black" : ""}
-                ${isPast ? "opacity-50 cursor-not-allowed" : "hover:bg-white/30"}
-                transition
+                ${isPast ? "opacity-50 cursor-not-allowed" : "hover:bg-white/30 cursor-pointer"}
+                transition 
               `}
             >
               {d}
@@ -85,8 +84,8 @@ export const Calendar = ({ selectedDate, onSelectDate }: CalendarProps) => {
         })}
       </div>
       <button
-        onClick={() => onSelectDate(today.toISOString().split("T")[0])}
-        className="mt-3 w-full py-1 bg-blue-200 rounded hover:scale-105 transition text-black"
+        onClick={() => onSelectDate(today.toLocaleDateString("sv-SE"))}
+        className="mt-3 w-full py-1 bg-blue-200 rounded hover:scale-105 transition text-black cursor-pointer"
       >
         Сегодня
       </button>
