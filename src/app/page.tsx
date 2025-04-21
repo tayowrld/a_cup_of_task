@@ -1,103 +1,150 @@
-import Image from "next/image";
+// app/page.tsx
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import Header from '@/components/layout/header';
+import Workspace from '@/components/workflow/workspace';
+import { Task } from '@/types/types';
+import { getTasks, saveTasks } from '@/lib/db';
+import { useACH } from '@/contexts/AchievementContext';
+
+const QUOTES = [
+  "Новый день — пора новых амбиций",
+  "Каждый миг приносит шанс перезапустить историю",
+  "Встречай все вокруг с надеждой и энергией",
+  "Наш день начнется с победы над вчерашними сомнениями",
+  "Настало твое время действовать",
+  // …ещё 95 цитат
+] as const;
+
+type Phase = 'day' | 'eve';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [isEditingMode, setIsEditingMode] = useState(false);
+  const [phase, setPhase] = useState<Phase>('day');
+  const [showQuote, setShowQuote] = useState(false);
+  const [quote, setQuote] = useState('');
+  const { recordEvent } = useACH();
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  // Фон, цитата + дни открытия
+  useEffect(() => {
+    recordEvent('daysOpened');           // 16,17,18: открыть приложение 1/5/10 дней
+
+    const now = new Date();
+    const hour = now.getHours();
+    setPhase(hour >= 18 || hour < 6 ? 'eve' : 'day');
+
+    const todayKey = now.toISOString().slice(0, 10);
+    if (localStorage.getItem('lastVisitDate') !== todayKey) {
+      const idx = Math.floor(Math.random() * QUOTES.length);
+      setQuote(QUOTES[idx]);
+      setShowQuote(true);
+      localStorage.setItem('lastVisitDate', todayKey);
+      setTimeout(() => setShowQuote(false), 5000);
+    }
+  }, [recordEvent]);
+
+  // Загрузка сохранённых задач
+  useEffect(() => {
+    getTasks().then((stored) => {
+      if (stored?.length) setTasks(stored);
+    });
+  }, []);
+
+  const updateTasks = (updated: Task[]) => {
+    setTasks(updated);
+    saveTasks(updated);
+  };
+
+  // Создание задачи
+  const handleCreateTask = (name: string, date: string) => {
+    const newTask: Task = {
+      id: tasks.length,
+      name,
+      date,
+      priority: undefined,
+      status: { value: 'Actual', color: 'amber' },
+    };
+    const updated = [...tasks, newTask];
+    updateTasks(updated);
+    recordEvent('tasksCreated');        // 5,6,7: добавить 1/5/10 задач
+  };
+
+  // Переименование задачи (не в ачивках)
+  const handleRenameTask = (id: number, newName: string) => {
+    const updated = tasks.map((t) =>
+      t.id === id ? { ...t, name: newName } : t
+    );
+    updateTasks(updated);
+  };
+
+  // Удаление задачи (не в ачивках)
+  const handleDeleteTask = (id: number) => {
+    const updated = tasks.filter((t) => t.id !== id);
+    updateTasks(updated);
+  };
+
+  // Смена приоритета (не в ачивках)
+  const handlePrioritySwitch = (
+    id: number,
+    priority: { value: string; color: string }
+  ) => {
+    const updated = tasks.map((t) =>
+      t.id === id ? { ...t, priority } : t
+    );
+    updateTasks(updated);
+  };
+
+  // Смена статуса задачи
+  const handleStatusSwitch = (
+    id: number,
+    status: { value: string; color: string }
+  ) => {
+    const updated = tasks.map((t) =>
+      t.id === id ? { ...t, status } : t
+    );
+    updateTasks(updated);
+    if (status.value === 'Done') {
+      recordEvent('tasksCompleted');    // 8,9,10: выполнить 1/5/10 задач
+    }
+  };
+
+  // Режим редактирования / сессии / переключение режима
+  const handleToggleEditingMode = () => {
+    setIsEditingMode((prev) => !prev);
+    recordEvent('sessions');            // 11,12,13: начать 1/5/10 сессий
+    recordEvent('modeToggles');         // 19,20: переключить режим 5/20 раз
+  };
+
+  return (
+    <>
+      {showQuote && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black quote-overlay z-50">
+          <p className="text-4xl text-amber-100 bg-amber-100/20 border-pink-200 border-2 px-6 py-2 text-center">
+            {quote}
+          </p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      )}
+
+      <Header
+        onCreateTask={() =>
+          handleCreateTask(
+            'Новая задача',
+            new Date().toISOString().split('T')[0]
+          )
+        }
+        onToggleEdit={handleToggleEditingMode}
+      />
+
+      <Workspace
+        tasks={tasks}
+        isEditing={isEditingMode}
+        onRenameTask={handleRenameTask}
+        onDeleteTask={handleDeleteTask}
+        onPrioritySwitch={handlePrioritySwitch}
+        onStatusSwitch={handleStatusSwitch}
+      />
+    </>
   );
 }
