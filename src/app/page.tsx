@@ -7,6 +7,7 @@ import Workspace from '@/components/workflow/workspace';
 import { Task } from '@/types/types';
 import { getTasks, saveTasks } from '@/lib/db';
 import { useACH } from '@/contexts/AchievementContext';
+import { Calendar } from '@/components/ui/Calendar';
 
 const QUOTES = [
   "Новый день — пора новых амбиций",
@@ -17,23 +18,29 @@ const QUOTES = [
   // …ещё 95 цитат
 ] as const;
 
-type Phase = 'day' | 'eve';
-
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isEditingMode, setIsEditingMode] = useState(false);
-  const [phase, setPhase] = useState<Phase>('day');
   const [showQuote, setShowQuote] = useState(false);
   const [quote, setQuote] = useState('');
   const { recordEvent } = useACH();
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(() =>
+    new Date().toISOString().split('T')[0]
+  );
+
+  // Загрузка и дни открытия
+  useEffect(() => {
+    getTasks().then((stored) => stored && setTasks(stored));
+    recordEvent('daysOpened');
+  }, [recordEvent]);
+
 
   // Фон, цитата + дни открытия
   useEffect(() => {
     recordEvent('daysOpened');           // 16,17,18: открыть приложение 1/5/10 дней
 
     const now = new Date();
-    const hour = now.getHours();
-    setPhase(hour >= 18 || hour < 6 ? 'eve' : 'day');
 
     const todayKey = now.toISOString().slice(0, 10);
     if (localStorage.getItem('lastVisitDate') !== todayKey) {
@@ -57,57 +64,30 @@ export default function Home() {
     saveTasks(updated);
   };
 
-  // Создание задачи
   const handleCreateTask = (name: string, date: string) => {
-    const newTask: Task = {
+    recordEvent('tasksCreated');
+    const newT: Task = {
       id: tasks.length,
       name,
       date,
       priority: undefined,
       status: { value: 'Actual', color: 'amber' },
     };
-    const updated = [...tasks, newTask];
-    updateTasks(updated);
-    recordEvent('tasksCreated');        // 5,6,7: добавить 1/5/10 задач
+    updateTasks([...tasks, newT]);
   };
 
-  // Переименование задачи (не в ачивках)
-  const handleRenameTask = (id: number, newName: string) => {
-    const updated = tasks.map((t) =>
-      t.id === id ? { ...t, name: newName } : t
-    );
-    updateTasks(updated);
-  };
+  const handleRenameTask = (id: number, newName: string) =>
+    updateTasks(tasks.map((t) => (t.id === id ? { ...t, name: newName } : t)));
 
-  // Удаление задачи (не в ачивках)
-  const handleDeleteTask = (id: number) => {
-    const updated = tasks.filter((t) => t.id !== id);
-    updateTasks(updated);
-  };
+  const handleDeleteTask = (id: number) =>
+    updateTasks(tasks.filter((t) => t.id !== id));
 
-  // Смена приоритета (не в ачивках)
-  const handlePrioritySwitch = (
-    id: number,
-    priority: { value: string; color: string }
-  ) => {
-    const updated = tasks.map((t) =>
-      t.id === id ? { ...t, priority } : t
-    );
-    updateTasks(updated);
-  };
+  const handlePrioritySwitch = (id: number, pr: {value:string, color:string}) =>
+    updateTasks(tasks.map((t) => (t.id === id ? { ...t, priority: pr } : t)));
 
-  // Смена статуса задачи
-  const handleStatusSwitch = (
-    id: number,
-    status: { value: string; color: string }
-  ) => {
-    const updated = tasks.map((t) =>
-      t.id === id ? { ...t, status } : t
-    );
-    updateTasks(updated);
-    if (status.value === 'Done') {
-      recordEvent('tasksCompleted');    // 8,9,10: выполнить 1/5/10 задач
-    }
+  const handleStatusSwitch = (id: number, st: {value:string, color:string}) => {
+    updateTasks(tasks.map((t) => (t.id === id ? { ...t, status: st } : t)));
+    if (st.value === 'Done') recordEvent('tasksCompleted');
   };
 
   // Режим редактирования / сессии / переключение режима
@@ -135,11 +115,25 @@ export default function Home() {
           )
         }
         onToggleEdit={handleToggleEditingMode}
+        onToggleCalendar={() => setShowCalendar((p) => !p)}
       />
+
+
+
+      {showCalendar && (
+        <Calendar
+          selectedDate={selectedDate}
+          onSelectDate={(d) => {
+            setSelectedDate(d);
+            setShowCalendar(false);
+          }}
+        />
+      )}
 
       <Workspace
         tasks={tasks}
         isEditing={isEditingMode}
+        selectedDate={selectedDate}
         onRenameTask={handleRenameTask}
         onDeleteTask={handleDeleteTask}
         onPrioritySwitch={handlePrioritySwitch}

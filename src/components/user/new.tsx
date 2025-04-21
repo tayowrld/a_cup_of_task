@@ -77,14 +77,14 @@ export const Profile = ({
       <div className="flex justify-between">
         <button
           onClick={() => onSubmit(name.trim(), avatar.trim())}
-          className="px-3 py-1 bg-green-200 rounded hover:scale-105 transition"
+          className="px-3 py-1 bg-green-200 rounded hover:scale-105 transition cursor-pointer"
         >
           Сохранить
         </button>
         {onCancel && (
           <button
             onClick={onCancel}
-            className="px-3 py-1 bg-red-200 rounded hover:scale-105 transition"
+            className="px-3 py-1 bg-red-200 rounded hover:scale-105 transition cursor-pointer"
           >
             Отменить
           </button>
