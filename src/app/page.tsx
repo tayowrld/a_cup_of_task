@@ -208,7 +208,7 @@ export default function Home() {
         onCreateTask={() =>
           handleCreateTask(
             '',
-            new Date().toISOString().split('T')[0]
+            new Date().toLocaleDateString("sv-SE")
           )
         }
         onToggleEdit={handleToggleEditingMode}

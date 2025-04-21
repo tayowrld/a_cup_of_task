@@ -87,7 +87,7 @@ export const Calendar = ({ selectedDate, onSelectDate }: CalendarProps) => {
         onClick={() => onSelectDate(today.toLocaleDateString("sv-SE"))}
         className="mt-3 w-full py-1 bg-blue-200 rounded hover:scale-105 transition text-black cursor-pointer"
       >
-        Сегодня
+        Today
       </button>
     </div>
   );

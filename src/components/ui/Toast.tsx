@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 export const ToastContainer = () => {
   const { toasts } = useToast();
   return (
-    <div className="fixed top-4 right-4 flex flex-col space-y-2 z-1000">
+    <div className="fixed top-4 left-4 flex flex-col space-y-2 z-1000">
       <AnimatePresence>
         {toasts.map((t) => (
           <motion.div
