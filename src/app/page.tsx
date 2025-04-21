@@ -115,7 +115,7 @@ export default function Home() {
   const { recordEvent } = useACH();
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState(() =>
-    new Date().toISOString().split('T')[0]
+    new Date().toLocaleDateString("sv-SE")
   );
 
   // Загрузка и дни открытия
