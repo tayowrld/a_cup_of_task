@@ -1,8 +1,9 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "a_cup_of_tasks",
-  "version": "0.5.0",
-  "identifier": "ru.sai-mori.a-cup-of-tasks",
+  "productName": "A Cup of Tasks",
+  "mainBinaryName": "a_cup_of_tasks",
+  "version": "0.5.5",
+  "identifier": "com.saimori.ACupOfTasks",
   "build": {
     "frontendDist": "../out",
     "devUrl": "http://localhost:3000",
@@ -13,13 +14,12 @@
     "windows": [
       {
         "title": "A Cup of Tasks",
-        "width": 1000,
-        "height": 800,
-        "minWidth": 960,
-        "minHeight": 700,
+        "width": 1200,
+        "height": 900,
+        "minWidth": 950,
+        "minHeight": 900,
         "resizable": true,
-        "fullscreen": false,
-        "decorations": true
+        "fullscreen": false
       }
     ],
     "security": {
@@ -27,6 +27,20 @@
     }
   },
   "bundle": {
-    "targets": ["deb", "appimage"]
+    "active": true,
+    "targets": "all",
+    "linux": {
+      "deb": {
+        "files": {}
+      },
+      "rpm": {
+        "epoch": 0,
+        "files": {},
+        "release": "1"
+      }
+    },
+    "icon": [
+      "icons/icon.png"
+    ]
   }
 }

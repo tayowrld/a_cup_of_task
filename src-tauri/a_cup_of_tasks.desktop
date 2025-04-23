@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=A Cup of Tasks
+Exec=a_cup_of_tasks
+Icon=a_cup_of_tasks
+Type=Application
+Categories=Utility;
+StartupNotify=true
+Terminal=false

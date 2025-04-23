@@ -38,7 +38,7 @@ const Select = (
         <div className="relative" onClick={() => setIsOpen(!isOpen)}>
             <motion.button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`bg-${selectedColor ?? color ?? 'white'}-200 text-white py-2 px-4 rounded-full cursor-pointer hover:scale-105 transition duration-300`}
+                className={`bg-${selectedColor ?? color ?? 'white'}-200 text-white py-2 px-4 cursor-pointer hover:scale-105 transition duration-300  w-[124px]`}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
             >
@@ -46,7 +46,7 @@ const Select = (
             </motion.button>
 
             {isOpen && (
-                <ul className="absolute top-[-50%] translate-y-[-100%] translate-x-[-50%] left-1/2 bg-white border rounded shadow-lg mt-2 w-[max-content]">
+                <ul className="absolute top-[-50%] translate-y-[-100%] translate-x-[-50%] left-1/2 bg-white border shadow-lg mt-2 w-[max-content] z-100">
                     {options.map((option) => (
                         <li key={option.value} onClick={() => handleSelect(option)} className="py-2 px-4 hover:bg-gray-200 cursor-pointer">
                             {option.value}

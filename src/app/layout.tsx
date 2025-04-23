@@ -18,7 +18,7 @@ export default function RootLayout({
 
   return (
     <html lang="ru">
-      <body className={`max-h-screen flex flex-col font-sans ${Pixelify.className} transition-colors duration-1000`}>
+      <body className={`max-h-[100vh] flex flex-col font-sans ${Pixelify.className} transition-colors duration-1000`}>
         <Background />
         <UserProvider>
           <ToastProvider>

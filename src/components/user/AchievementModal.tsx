@@ -10,9 +10,9 @@ export const AchievementModal = () => {
   if (!isModalOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 overflow-hidden">
       <motion.div
-        className="bg-white/50 backdrop-blur-lg p-6 rounded-2xl max-w-md w-full text-white max-h-1/2 overflow-y-auto"
+        className="bg-white/50 backdrop-blur-lg p-6 rounded max-w-md w-full text-white max-h-1/2 overflow-y-auto"
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
       >
@@ -66,7 +66,7 @@ export const AchievementModal = () => {
         </ul>
         <button
           onClick={closeModal}
-          className="sticky mt-6 bottom-0 left-0 w-full py-2 bg-red-200 rounded-full hover:scale-105 transition cursor-pointer text-2xl"
+          className="sticky mt-6 bottom-0 left-0 w-full py-2 bg-[#ff8181d9] rounded hover:scale-105 transition cursor-pointer text-2xl"
         >
           Close
         </button>

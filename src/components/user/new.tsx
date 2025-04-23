@@ -57,7 +57,7 @@ export const Profile = ({
   }, [initialName, initialAvatar]);
 
   return (
-    <div className="absolute right-0 mt-2 w-64 bg-white/50 backdrop-blur-lg p-4 rounded-lg shadow-lg z-50">
+    <div className="absolute right-0 mt-2 w-64 bg-white/95 p-4 rounded border-2 border-black shadow-lg z-50">
       <label className="block mb-2 text-white">
         Name
         <input

@@ -26,7 +26,6 @@ export const Calendar = ({ selectedDate, onSelectDate }: CalendarProps) => {
   const nextMonth = () =>
     setCurrentMonth(new Date(year, month + 1, 1));
 
-  // Собираем массив дат
   const blanks = Array(firstDayIndex).fill(null);
   const dayNumbers = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
