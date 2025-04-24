@@ -36,9 +36,13 @@ jobs:
       - name: Build Tauri app
         run: cargo tauri build
 
-      - name: Upload app bundle
-        uses: actions/upload-artifact@v3
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
         with:
-          name: ${{ matrix.platform }}-tauri-build
-          path: |
-            src-tauri/target/release/bundle
+          files: |
+            src-tauri/target/release/bundle/**/*.dmg
+            src-tauri/target/release/bundle/**/*.msi
+            src-tauri/target/release/bundle/**/*.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
