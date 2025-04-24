@@ -33,8 +33,11 @@ jobs:
           TAURI_BUILD_TYPE: release
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
-      - name: Upload bundle
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: tauri-build-${{ matrix.platform }}
-          path: src-tauri/target/release/bundle
+          name: tauri-macos-build
+          path: |
+            "src-tauri/target/release/bundle/dmg/A Cup of Tasks_*.dmg"
+            "src-tauri/target/release/bundle/macos/A Cup of Tasks.app"
+  
