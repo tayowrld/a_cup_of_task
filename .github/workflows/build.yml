@@ -1,0 +1,44 @@
+name: Tauri Cross-Platform Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli
+
+      - name: Install frontend deps
+        run: npm install
+
+      - name: Build Next.js frontend
+        run: npm run build
+
+      - name: Build Tauri app
+        run: cargo tauri build
+
+      - name: Upload app bundle
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.platform }}-tauri-build
+          path: |
+            src-tauri/target/release/bundle
