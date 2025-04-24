@@ -39,8 +39,8 @@ jobs:
         with:
           name: tauri-macos-build
           path: |
-            src-tauri/target/release/bundle/dmg/A Cup of Tasks_*.dmg
-            src-tauri/target/release/bundle/macos/A Cup of Tasks.app
+            src-tauri/target/release/bundle/dmg/A\ Cup\ of\ Tasks_*.dmg
+            src-tauri/target/release/bundle/macos/A\ Cup\ of\ Tasks.app
 
       - name: Upload Windows build
         if: runner.os == 'Windows'
