@@ -34,10 +34,17 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: tauri-macos-build
           path: |
             "src-tauri/target/release/bundle/dmg/A Cup of Tasks_*.dmg"
             "src-tauri/target/release/bundle/macos/A Cup of Tasks.app"
-  
+      - name: Upload Windows build artifacts
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: tauri-windows-build
+          path: |
+            src-tauri/target/release/bundle/**/*.msi
+            src-tauri/target/release/bundle/**/*.exe
